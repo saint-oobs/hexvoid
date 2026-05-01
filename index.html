@@ -1,0 +1,2293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HexVoid Official Documentation</title>
+    <style>
+        :root {
+            --bg-color: #0c0c10;
+            --text-color: #e0e0e0;
+            --primary-accent: #5865F2;
+            --secondary-accent: #00E5FF;
+            --card-bg: rgba(26, 26, 36, 0.6);
+            --border-color: rgba(45, 45, 61, 0.8);
+            --glass-bg: rgba(15, 15, 19, 0.8);
+            --sidebar-width: 280px;
+            --header-height: 80px;
+        }
+
+        * {
+            box-sizing: border-box;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-accent) #1a1a24;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: var(--primary-accent);
+            border-radius: 4px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+            animation: fadeIn 1.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            font-size: clamp(3rem, 6vw, 6rem);
+            color: rgba(88, 101, 242, 0.04);
+            white-space: nowrap;
+            z-index: 0;
+            pointer-events: none;
+            font-weight: 900;
+            letter-spacing: 12px;
+            animation: floatWatermark 25s ease-in-out infinite;
+            width: 100vw;
+            text-align: center;
+        }
+
+        @keyframes floatWatermark {
+            0% {
+                transform: translate(-50%, -48%) rotate(-15deg) scale(1);
+            }
+
+            50% {
+                transform: translate(-50%, -52%) rotate(-15deg) scale(1.05);
+            }
+
+            100% {
+                transform: translate(-50%, -48%) rotate(-15deg) scale(1);
+            }
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background-color: var(--card-bg);
+            border-left: 4px solid var(--secondary-accent);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 6px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            font-family: inherit;
+            font-size: 0.95rem;
+            animation: slideInToast 0.3s forwards, fadeOutToast 0.3s forwards 2.7s;
+            opacity: 0;
+        }
+
+        @keyframes slideInToast {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOutToast {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(200%);
+                opacity: 0;
+            }
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(88, 101, 242, 0.5);
+            display: flex;
+            align-items: center;
+        }
+
+        .logo span {
+            color: var(--secondary-accent);
+            margin-left: 8px;
+        }
+
+        .search-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 14px 24px;
+            border-radius: 30px;
+            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.03);
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-container input:focus {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--primary-accent);
+            box-shadow: 0 0 20px rgba(88, 101, 242, 0.3);
+        }
+
+        .layout {
+            display: flex;
+            margin-top: var(--header-height);
+            flex: 1;
+        }
+
+        aside {
+            width: var(--sidebar-width);
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            top: var(--header-height);
+            bottom: 0;
+            left: 0;
+            overflow-y: auto;
+            padding: 20px 0;
+            z-index: 90;
+        }
+
+        aside ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        aside li {
+            margin: 2px 0;
+        }
+
+        aside a {
+            display: block;
+            padding: 10px 25px;
+            color: #aaa;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+
+        aside a:hover,
+        aside a.active {
+            background: rgba(88, 101, 242, 0.1);
+            color: #fff;
+            border-left-color: var(--primary-accent);
+        }
+
+        .sidebar-category {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: var(--primary-accent);
+            font-weight: bold;
+            padding: 20px 25px 10px;
+            letter-spacing: 1px;
+        }
+
+        main {
+            margin-left: var(--sidebar-width);
+            padding: 40px;
+            flex: 1;
+            max-width: 1100px;
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: #ffffff;
+            margin-top: 1.5em;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            border-bottom: 3px solid transparent;
+            padding-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            margin-top: 0;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-accent), var(--secondary-accent), var(--primary-accent));
+            background-size: 200% 100%;
+            animation: gradientMove 3s linear infinite;
+        }
+
+        @keyframes gradientMove {
+            0% {
+                background-position: 100% 0;
+            }
+
+            100% {
+                background-position: -100% 0;
+            }
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            color: var(--primary-accent);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 5px;
+            scroll-margin-top: calc(var(--header-height) + 20px);
+        }
+
+        h3 {
+            font-size: 1.3rem;
+            color: #8ea1e1;
+            margin-bottom: 15px;
+            margin-top: 2em;
+            scroll-margin-top: calc(var(--header-height) + 20px);
+        }
+
+        .subtitle {
+            font-style: italic;
+            color: #888;
+            margin-top: -15px;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+
+        .author {
+            color: var(--secondary-accent);
+            font-weight: bold;
+            font-family: monospace;
+        }
+
+        .content-ul {
+            list-style-type: square;
+            padding-left: 20px;
+            color: #bbb;
+            line-height: 1.7;
+        }
+
+        .content-ul li {
+            margin-bottom: 10px;
+        }
+
+        .content-ul strong {
+            color: #fff;
+        }
+
+        .command-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--primary-accent);
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            backdrop-filter: blur(5px);
+        }
+
+        .command-card:hover {
+            transform: translateX(8px) translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            border-left-color: var(--secondary-accent);
+            border-top-color: rgba(255, 255, 255, 0.05);
+            background-color: rgba(30, 30, 42, 0.8);
+        }
+
+        .command-title {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.15rem;
+            color: var(--secondary-accent);
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: inline-block;
+            background: rgba(0, 229, 255, 0.05);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        code {
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+            color: #00E5FF;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .path {
+            color: #8ea1e1;
+            font-family: monospace;
+            font-size: 0.9em;
+            background: rgba(142, 161, 225, 0.1);
+            padding: 2px 5px;
+            border-radius: 4px;
+        }
+
+        .dos-and-donts {
+            list-style: none;
+            padding: 0;
+        }
+
+        .dos-and-donts li {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            border-left: 3px solid transparent;
+        }
+
+        .dos-and-donts .do {
+            color: #00E5FF;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        .dos-and-donts li:has(.do) {
+            border-left-color: #00E5FF;
+        }
+
+        .dos-and-donts .dont {
+            color: #ff5555;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        .dos-and-donts li:has(.dont) {
+            border-left-color: #ff5555;
+        }
+
+        .dos-and-donts .info {
+            color: #a464f4;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        .dos-and-donts li:has(.info) {
+            border-left-color: #a464f4;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 0;
+            color: #888;
+            font-size: 1.2rem;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            aside {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            main {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .header-menu-btn {
+                display: block;
+            }
+        }
+
+        /* Copy Icon and Accordions */
+        .cmd-accordion summary {
+            margin-bottom: 10px;
+            cursor: pointer;
+            list-style: none;
+            transition: all 0.3s ease;
+        }
+
+        .cmd-accordion summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .cmd-accordion[open] summary h3 {
+            border-bottom-color: var(--secondary-accent);
+        }
+
+        .cmd-accordion summary:hover h3 {
+            color: #fff;
+        }
+
+        .command-title {
+            position: relative;
+            display: flex !important;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .copy-btn {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+        }
+
+        .command-card:hover .copy-btn {
+            opacity: 1;
+        }
+
+        .copy-btn:hover {
+            color: var(--secondary-accent);
+            background: rgba(0, 229, 255, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="watermark">HEXVOID // ITSHECKER</div>
+
+    <header>
+        <div class="logo">HexVoid <span>Docs</span></div>
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="Search parameters, commands, modules...">
+        </div>
+    </header>
+
+    <div class="layout">
+        <aside id="sidebar">
+            <ul>
+                <li class="sidebar-category">Core Concepts</li>
+                <li><a href="#overview">Architecture Overview</a></li>
+                <li><a href="#principles">Working Principles</a></li>
+                <li class="sidebar-category">Commands</li>
+                <li><a href="#cmd-actions">Actions</a></li>
+                <li><a href="#cmd-afk">Afk</a></li>
+                <li><a href="#cmd-automod">Automod Config</a></li>
+                <li><a href="#cmd-autoroles">Autoroles</a></li>
+                <li><a href="#cmd-counting">Counting</a></li>
+                <li><a href="#cmd-embedbuilder">Embedbuilder</a></li>
+                <li><a href="#cmd-fun">Fun</a></li>
+                <li><a href="#cmd-giveaway">Giveaway</a></li>
+                <li><a href="#cmd-giveaway-config">Giveaway Config</a></li>
+                <li><a href="#cmd-moderation">Moderation</a></li>
+                <li><a href="#cmd-notes">Mod Notes</a></li>
+                <li><a href="#cmd-reactionroles">Reactionroles</a></li>
+                <li><a href="#cmd-reminders">Reminders</a></li>
+                <li><a href="#cmd-rolemanager">Rolemanager</a></li>
+                <li><a href="#cmd-sticky">Sticky</a></li>
+                <li><a href="#cmd-strikes">Strikes</a></li>
+                <li><a href="#cmd-tickets">Tickets</a></li>
+                <li><a href="#cmd-welcome">Welcome</a></li>
+                <li><a href="#cmd-toplevel">Top-Level</a></li>
+                <li class="sidebar-category">Advanced Settings</li>
+                <li><a href="#tasks">Background Tasks</a></li>
+                <li><a href="#database">Database Schema</a></li>
+                <li><a href="#rules">Developer Rules</a></li>
+            </ul>
+        </aside>
+
+        <main id="main-content">
+            <h1 class="searchable-text">Official Documentation</h1>
+            <p class="subtitle searchable-text">The void is watching. | Architect: <span class="author">ITSHECKER</span>
+            </p>
+
+            <div id="search-empty" class="empty-state">No matching results found in the void. Try another search
+                protocol.</div>
+
+            <section id="overview" class="doc-section searchable-section">
+                <h2>1. Architecture Overview & Core Philosophy</h2>
+                <p>HexVoid is a custom, highly optimized Discord bot framework built on core non-negotiable pillars:</p>
+                <ul class="content-ul">
+                    <li><strong>Stateless:</strong> Unbounded lists or dictionaries are never cached in RAM. Every
+                        process relies purely on async SQLite lookups for memory safety. We scale without memory leaks.
+                    </li>
+                    <li><strong>SQLite-Driven:</strong> Everything from moderation cases to gallery restrictions is
+                        stored locally in a high-speed, WAL-enabled SQLite database (<span
+                            class="path">database/db.py</span>).</li>
+                    <li><strong>Zero Legacy Code:</strong> HexVoid uses modern <code>app_commands</code> (Slash
+                        Commands) exclusively. No deprecated prefix commands are supported for user-facing modules.</li>
+                    <li><strong>Ephemeral Ghost Mode UI:</strong> Interactions are designed to be clean and completely
+                        invisible. Commands execute silently, and standard bot replies are ephemeral to avoid cluttering
+                        the chat with command spam.</li>
+                </ul>
+            </section>
+
+            <section id="principles" class="doc-section searchable-section">
+                <h2>2. Working Principles</h2>
+
+                <h3>The AutoMod Strike Ladder and Decay Engine</h3>
+                <p>HexVoid implements an active user punishment ladder built into the core moderation system. As users
+                    break rules, they ascend internal strike levels, mapped to escalating automated consequences.</p>
+                <ul class="content-ul">
+                    <li><strong>Sequential Escalation:</strong> Violations auto-escalate users to higher tiers (e.g.,
+                        Warning, 1hr Mute, 24hr Mute, Ban) depending on their accumulated history in the
+                        <code>STRIKE_LADDER</code> config.
+                    </li>
+                    <li><strong>The Decay Engine:</strong> A background periodic task (<code>tasks.loop</code>)
+                        continually evaluates user strike epochs. Once an established cooldown duration expires without
+                        incident, the engine natively decays the strike level by one step, actively promoting
+                        forgiveness for reformed members.</li>
+                    <li><strong>Action Verification:</strong> Punishments applied via the strike engine natively catch
+                        <code>discord.Forbidden</code> exceptions and emit Mod-Log embeds tracking whether the bot
+                        lacked permission to complete an escalation.
+                    </li>
+                </ul>
+
+                <h3>Memory-Safe UI Views</h3>
+                <p>Discord UI Components (Buttons, Dropdowns, Modals) and persistent tasks require highly defensive
+                    memory management.</p>
+                <ul class="content-ul">
+                    <li><strong>Task GC Tracking:</strong> Background tasks holding ephemeral view interactions
+                        explicitly maintain strong references (<code>bg task refs</code>) to prevent the Python Garbage
+                        Collector from sweeping them out of memory, guaranteeing timeouts/modals execute flawlessly.
+                    </li>
+                    <li><strong>Severed Database Cursors:</strong> Heavy lookups utilizing <code>aiosqlite</code>
+                        immediately fetch data, collapse the results into dictionaries containing pure values, and
+                        instantly drop/release the cursor reference (e.g., <code>aiosqlite Row -> dict</code> mappings).
+                        Database cursors are never held open during interactive UI lifecycles, guaranteeing zero DB
+                        lockups or leaked database row generators.</li>
+                </ul>
+            </section>
+
+            <h2 id="commands" class="searchable-section">3. The Command Reference</h2>
+
+            <section id="cmd-actions" class="doc-section cmd-category">
+                <details class="cmd-accordion">
+                    <summary>
+                        <h3>Actions (<span class="path">cogs/actions.py</span>)</h3>
+                    </summary>
+                    <div class="command-card">
+                        <div class="command-title">/ignore add &lt;target&gt; &lt;duration&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Add a user, role or channel to automod ignore list</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/ignore list<button class="copy-btn" title="Copy Command"><svg
+                                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Show all automod-ignored targets</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/ignore remove &lt;target&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Remove a target from automod ignore list</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/nickname_group random &lt;user&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Force a random funny nickname on a user</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/nickname_group set &lt;new_name&gt; &lt;user&gt;<button
+                                class="copy-btn" title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Force-change a user's nickname</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/purge file &lt;count&gt; &lt;extension&gt; &lt;user&gt;<button
+                                class="copy-btn" title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Delete messages containing specific file types</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/purge image &lt;count&gt; &lt;user&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Delete messages containing images</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/purge messages &lt;count&gt; &lt;user&gt; &lt;contains&gt;
+                            &lt;regex&gt;
+                            &lt;message_id&gt; &lt;channel&gt;</div>
+                        <div><strong>Description:</strong> Bulk delete messages from the channel</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/purge reactions &lt;message_id&gt; &lt;channel&gt;
+                            &lt;user&gt;<button class="copy-btn" title="Copy Command"><svg width="16" height="16"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Clear reactions from a message</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/reaction list<button class="copy-btn" title="Copy Command"><svg
+                                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> List all reaction-locked messages</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/reaction lock &lt;message_id&gt; &lt;channel&gt;<button
+                                class="copy-btn" title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Lock reactions on a specific message</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/reaction unlock &lt;message_id&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Unlock reactions on a specific message</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/voice deafen &lt;user&gt; &lt;duration&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Server-deafen a user in voice (Run in user's VC text chat)
+                        </div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/voice kick &lt;user&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Kick a user from voice (Run in user's VC text chat)</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/voice mute &lt;user&gt; &lt;duration&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Server-mute a user in voice (Run in user's VC text chat)
+                        </div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/voice undeafen &lt;user&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Remove voice deafen from a user (Run in user's VC text chat)
+                        </div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/voice unmute &lt;user&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Remove voice mute from a user (Run in user's VC text chat)
+                        </div>
+                    </div>
+                </details>
+            </section>
+
+            <section id="cmd-afk" class="doc-section cmd-category">
+                <details class="cmd-accordion">
+                    <summary>
+                        <h3>Afk (<span class="path">cogs/afk.py</span>)</h3>
+                    </summary>
+                    <div class="command-card">
+                        <div class="command-title">/afk set &lt;reason&gt; &lt;time_till&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Set your AFK status</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/afkmod blacklist &lt;target&gt; &lt;remove&gt;<button
+                                class="copy-btn" title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Manage AFK blacklist (overrides whitelist)</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/afkmod force_add &lt;user&gt; &lt;reason&gt;
+                            &lt;time_till&gt;<button class="copy-btn" title="Copy Command"><svg width="16" height="16"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Force-add a user to AFK</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/afkmod force_remove &lt;user&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Force-remove a user from AFK</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/afkmod list<button class="copy-btn" title="Copy Command"><svg
+                                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> List all AFK users</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/afkmod whitelist &lt;target&gt; &lt;remove&gt;<button
+                                class="copy-btn" title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Manage AFK whitelist</div>
+                    </div>
+                </details>
+            </section>
+
+            <section id="cmd-automod" class="doc-section cmd-category">
+                <details class="cmd-accordion">
+                    <summary>
+                        <h3>Automod Config (<span class="path">cogs/automod_config.py</span>)</h3>
+                    </summary>
+                    <div class="command-card">
+                        <div class="command-title">/automod adjust &lt;module&gt; &lt;setting&gt; &lt;value&gt;<button
+                                class="copy-btn" title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Adjust a specific module setting</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/automod config<button class="copy-btn" title="Copy Command"><svg
+                                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Open the auto-mod configuration dashboard</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/automod view &lt;module&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> View all current settings for a module</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/whitelist add &lt;domain&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Add a domain to the link whitelist</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/whitelist list<button class="copy-btn" title="Copy Command"><svg
+                                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Show all whitelisted domains</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/whitelist remove &lt;domain&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Remove a domain from the link whitelist</div>
+                    </div>
+                </details>
+            </section>
+
+            <section id="cmd-autoroles" class="doc-section cmd-category">
+                <details class="cmd-accordion">
+                    <summary>
+                        <h3>Autoroles (<span class="path">cogs/autoroles.py</span>)</h3>
+                    </summary>
+                    <div class="command-card">
+                        <div class="command-title">/autorole add &lt;role&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Add an autorole that is automatically given upon join</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/autorole remove &lt;role&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Remove an autorole from the guild's list</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/autorole show<button class="copy-btn" title="Copy Command"><svg
+                                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Display the guild's AutoRoles</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/timedrole add &lt;user&gt; &lt;role&gt; &lt;duration&gt;<button
+                                class="copy-btn" title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Assign a role to a user for a specified duration</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/timedrole remove &lt;user&gt; &lt;role&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Remove a timed role manually</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/timedrole show<button class="copy-btn" title="Copy Command"><svg
+                                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Show active timed roles in the server</div>
+                    </div>
+                </details>
+            </section>
+
+            <section id="cmd-counting" class="doc-section cmd-category">
+                <details class="cmd-accordion">
+                    <summary>
+                        <h3>Counting (<span class="path">cogs/counting.py</span>)</h3>
+                    </summary>
+                    <div class="command-card">
+                        <div class="command-title">/count blacklist_add &lt;target&gt; &lt;duration_seconds&gt;<button
+                                class="copy-btn" title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Adds user/role to blacklist</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/count blacklist_remove &lt;target&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Removes user/role from blacklist</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/count dashboard<button class="copy-btn" title="Copy Command"><svg
+                                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Shows the active counting status</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/count disable &lt;channel&gt; &lt;purge_messages&gt;<button
+                                class="copy-btn" title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Removes config and purges if required</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/count set &lt;number&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Manually overrides the current count</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/count setup &lt;channel&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Sets the counting channel and initializes count at 0</div>
+                    </div>
+                </details>
+            </section>
+
+            <section id="cmd-embedbuilder" class="doc-section cmd-category">
+                <details class="cmd-accordion">
+                    <summary>
+                        <h3>Embedbuilder (<span class="path">cogs/embedbuilder.py</span>)</h3>
+                    </summary>
+                    <div class="command-card">
+                        <div class="command-title">/embed copy &lt;message_id&gt; &lt;target_channel&gt;
+                            &lt;source_channel&gt;</div>
+                        <div><strong>Description:</strong> Clone an embed from one channel to another</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/embed create &lt;channel&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Build a fresh embed with a modal popup</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/embed custom &lt;json_or_url&gt; &lt;channel&gt; &lt;file&gt;<button
+                                class="copy-btn" title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Generate an embed from raw JSON, Pastebin URL, or file</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/embed edit &lt;message_id&gt; &lt;channel&gt;<button
+                                class="copy-btn" title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Edit an existing bot message embed via modal</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/embed editcustom &lt;message_id&gt; &lt;json_or_url&gt;
+                            &lt;channel&gt;
+                            &lt;file&gt;</div>
+                        <div><strong>Description:</strong> Edit an existing embed via raw JSON, URL, or file</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/embed source &lt;message_id&gt; &lt;channel&gt;<button
+                                class="copy-btn" title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Extract the JSON source of an existing bot embed</div>
+                    </div>
+                </details>
+            </section>
+
+            <section id="cmd-fun" class="doc-section cmd-category">
+                <details class="cmd-accordion">
+                    <summary>
+                        <h3>Fun (<span class="path">cogs/fun.py</span>)</h3>
+                    </summary>
+                    <div class="command-card">
+                        <div class="command-title">/emoji add &lt;name&gt; &lt;file&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Add a custom emoji to the server</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/emoji delete &lt;emoji_name&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Delete a custom emoji from the server</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/emoji list<button class="copy-btn" title="Copy Command"><svg
+                                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> List all server emojis with copyable format</div>
+                    </div>
+                </details>
+            </section>
+
+            <section id="cmd-giveaway" class="doc-section cmd-category">
+                <details class="cmd-accordion">
+                    <summary>
+                        <h3>Giveaway (<span class="path">cogs/giveaway.py</span>)</h3>
+                    </summary>
+                    <div class="command-card">
+                        <div class="command-title">/giveaway cancel &lt;giveaway_id&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Cancel a giveaway without picking winners</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/giveaway drop &lt;prize&gt; &lt;channel&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Create a first-click-wins drop giveaway</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/giveaway edit &lt;giveaway_id&gt; &lt;pastebin_link&gt;
+                            &lt;raw_json&gt;
+                            &lt;json_file&gt; &lt;embed_channel&gt; &lt;embed_message_id&gt;</div>
+                        <div><strong>Description:</strong> Edit an active giveaway</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/giveaway end &lt;giveaway_id&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Manually end a giveaway early</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/giveaway entries &lt;giveaway_id&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> View entries for a giveaway</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/giveaway list<button class="copy-btn" title="Copy Command"><svg
+                                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> List all active giveaways in this server</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/giveaway pause &lt;giveaway_id&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Pause an active giveaway</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/giveaway reaction &lt;message_id&gt; &lt;prize&gt; &lt;duration&gt;
+                            &lt;winners&gt; &lt;emoji&gt; &lt;channel&gt;</div>
+                        <div><strong>Description:</strong> Start a reaction-based giveaway on an existing message</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/giveaway reroll &lt;giveaway_id&gt; &lt;winners&gt;<button
+                                class="copy-btn" title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Reroll a giveaway (excludes previous winners)</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/giveaway resume &lt;giveaway_id&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Resume a paused giveaway</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/giveaway sponsor &lt;amount&gt; &lt;duration&gt; &lt;winners&gt;
+                            &lt;donor&gt; &lt;donor_msg&gt; &lt;image_url&gt; &lt;ping_roles&gt; &lt;req_roles&gt;</div>
+                        <div><strong>Description:</strong> Create a pre-styled Void Shard sponsor giveaway</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/giveaway start &lt;channel&gt; &lt;prize&gt; &lt;duration&gt;
+                            &lt;winners&gt; &lt;pastebin_link&gt; &lt;raw_json&gt; &lt;json_file&gt;
+                            &lt;embed_channel&gt;
+                            &lt;embed_message_id&gt; &lt;req_roles&gt;</div>
+                        <div><strong>Description:</strong> Create a new giveaway</div>
+                    </div>
+                </details>
+            </section>
+
+            <section id="cmd-giveaway-config" class="doc-section cmd-category">
+                <details class="cmd-accordion">
+                    <summary>
+                        <h3>Giveaway Config (<span class="path">cogs/giveaway_config.py</span>)</h3>
+                    </summary>
+                    <div class="command-card">
+                        <div class="command-title">/blacklist add &lt;words&gt; &lt;url&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Add words to the toxicity blacklist</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/blacklist list<button class="copy-btn" title="Copy Command"><svg
+                                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Show all blacklisted words</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/blacklist remove &lt;words&gt; &lt;url&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Remove words from the toxicity blacklist</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/bonus list<button class="copy-btn" title="Copy Command"><svg
+                                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> List all roles with bonus entries</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/bonus remove &lt;role&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Remove bonus entries from a role</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/bonus set &lt;role&gt; &lt;extra_entries&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Give a role bonus giveaway entries</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/giveaway-config dashboard<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> View giveaway configuration dashboard</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/giveaway-config set &lt;setting&gt; &lt;value&gt;<button
+                                class="copy-btn" title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Adjust a giveaway configuration setting</div>
+                    </div>
+                </details>
+            </section>
+
+            <section id="cmd-moderation" class="doc-section cmd-category">
+                <details class="cmd-accordion">
+                    <summary>
+                        <h3>Moderation (<span class="path">cogs/moderation.py</span>)</h3>
+                    </summary>
+                    <div class="command-card">
+                        <div class="command-title">/ban &lt;user&gt; &lt;duration&gt; &lt;reason&gt;<button
+                                class="copy-btn" title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Ban a user from the server</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/kick &lt;user&gt; &lt;reason&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Kick a user from the server</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/mute &lt;targets&gt; &lt;duration&gt; &lt;reason&gt;<button
+                                class="copy-btn" title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Apply a strike-ladder mute to users</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/timeout &lt;targets&gt; &lt;duration&gt; &lt;reason&gt;<button
+                                class="copy-btn" title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Apply a Discord timeout to users</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/unban &lt;user_id&gt; &lt;reason&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Unban a user from the server</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/unmute &lt;user&gt; &lt;reason&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Unmute a user in the server</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/untimeout &lt;user&gt; &lt;reason&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Remove a timeout from a user</div>
+                    </div>
+                </details>
+            </section>
+
+            <section id="cmd-notes" class="doc-section cmd-category">
+                <details class="cmd-accordion">
+                    <summary>
+                        <h3>Mod Notes (<span class="path">cogs/mod_notes.py</span>)</h3>
+                    </summary>
+                    <div class="command-card">
+                        <div class="command-title">/note add &lt;text&gt; &lt;user&gt; &lt;user_id&gt;<button
+                                class="copy-btn" title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Attach a secret note to a user</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/note clear &lt;user&gt; &lt;user_id&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Wipe all notes for a user</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/note delete &lt;note_id&gt; &lt;user&gt; &lt;user_id&gt;<button
+                                class="copy-btn" title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Delete a specific note</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/note edit &lt;note_id&gt; &lt;new_text&gt; &lt;user&gt;
+                            &lt;user_id&gt;
+                        </div>
+                        <div><strong>Description:</strong> Edit an existing note</div>
+                    </div>
+                </details>
+            </section>
+
+            <section id="cmd-reactionroles" class="doc-section cmd-category">
+                <details class="cmd-accordion">
+                    <summary>
+                        <h3>Reactionroles (<span class="path">cogs/reactionroles.py</span>)</h3>
+                    </summary>
+                    <div class="command-card">
+                        <div class="command-title">/rr add &lt;message_id&gt; &lt;emoji&gt; &lt;role&gt; &lt;channel&gt;
+                        </div>
+                        <div><strong>Description:</strong> Bind a role to a message with an emoji</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/rr dashboard<button class="copy-btn" title="Copy Command"><svg
+                                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> View all active Reaction Roles for the server</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/rr purge &lt;message_id&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Wipe RR configs for a message, or the entire server if blank
+                        </div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/rr remove &lt;message_id&gt; &lt;role&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Unbind a role from a message</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/rr type &lt;message_id&gt; &lt;behavior_type&gt;<button
+                                class="copy-btn" title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Change a message's RR type (normal or unique)</div>
+                    </div>
+                </details>
+            </section>
+
+            <section id="cmd-reminders" class="doc-section cmd-category">
+                <details class="cmd-accordion">
+                    <summary>
+                        <h3>Reminders (<span class="path">cogs/reminders.py</span>)</h3>
+                    </summary>
+                    <div class="command-card">
+                        <div class="command-title">/reminder cancel &lt;reminder_id&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Cancel a pending reminder</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/reminder list<button class="copy-btn" title="Copy Command"><svg
+                                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> View your active reminders</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/reminder set &lt;time&gt; &lt;text&gt; &lt;dm_notify&gt;<button
+                                class="copy-btn" title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Set a personal reminder</div>
+                    </div>
+                </details>
+            </section>
+
+            <section id="cmd-rolemanager" class="doc-section cmd-category">
+                <details class="cmd-accordion">
+                    <summary>
+                        <h3>Rolemanager (<span class="path">cogs/rolemanager.py</span>)</h3>
+                    </summary>
+                    <div class="command-card">
+                        <div class="command-title">/role add &lt;user&gt; &lt;role&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Assign a role to a user</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/role create &lt;name&gt; &lt;color&gt; &lt;hoist&gt;<button
+                                class="copy-btn" title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Create a new role in the server</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/role info &lt;role&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> View information about a specific role</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/role remove &lt;user&gt; &lt;role&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Remove a role from a user</div>
+                    </div>
+                </details>
+            </section>
+
+            <section id="cmd-sticky" class="doc-section cmd-category">
+                <details class="cmd-accordion">
+                    <summary>
+                        <h3>Sticky (<span class="path">cogs/sticky.py</span>)</h3>
+                    </summary>
+                    <div class="command-card">
+                        <div class="command-title">/sticky remove<button class="copy-btn" title="Copy Command"><svg
+                                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Remove the sticky message from the current channel</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/sticky set &lt;message&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Set a sticky message for the current channel</div>
+                    </div>
+                </details>
+            </section>
+
+            <section id="cmd-strikes" class="doc-section cmd-category">
+                <details class="cmd-accordion">
+                    <summary>
+                        <h3>Strikes (<span class="path">cogs/strikes.py</span>)</h3>
+                    </summary>
+                    <div class="command-card">
+                        <div class="command-title">/strike add &lt;reason&gt; &lt;user&gt; &lt;user_id&gt;<button
+                                class="copy-btn" title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Escalate a user to the next strike level</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/strike check &lt;user&gt; &lt;user_id&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> View a user's current strike level and next escalation</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/strike remove &lt;reason&gt; &lt;user&gt; &lt;user_id&gt;<button
+                                class="copy-btn" title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Drop a user's strike level by 1 and reverse punishment</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/strike set &lt;level&gt; &lt;reason&gt; &lt;user&gt; &lt;user_id&gt;
+                        </div>
+                        <div><strong>Description:</strong> Manually override a user's strike level (Admin)</div>
+                    </div>
+                </details>
+            </section>
+
+            <section id="cmd-tickets" class="doc-section cmd-category">
+                <details class="cmd-accordion">
+                    <summary>
+                        <h3>Tickets (<span class="path">cogs/tickets.py</span>)</h3>
+                    </summary>
+                    <div class="command-card">
+                        <div class="command-title">/ticket add_user &lt;user&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Add user to ticket</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/ticket dashboard<button class="copy-btn" title="Copy Command"><svg
+                                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> View active ticket panels</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/ticket delete_panel &lt;message_id&gt; &lt;channel&gt;<button
+                                class="copy-btn" title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Nuke a ticket panel and its database tracking</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/ticket get_config &lt;message_id&gt; &lt;channel&gt;<button
+                                class="copy-btn" title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Dump a panel deep state config to JSON</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/ticket remove_user &lt;user&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Remove user from ticket</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/ticket setup &lt;config_file&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Setup ticket panel wizard</div>
+                    </div>
+                </details>
+            </section>
+
+            <section id="cmd-welcome" class="doc-section cmd-category">
+                <details class="cmd-accordion">
+                    <summary>
+                        <h3>Welcome (<span class="path">cogs/welcome.py</span>)</h3>
+                    </summary>
+                    <div class="command-card">
+                        <div class="command-title">/welcome add_channel &lt;channel&gt; &lt;raw_json&gt; &lt;file&gt;
+                            &lt;link&gt;</div>
+                        <div><strong>Description:</strong> Add a channel welcome config</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/welcome add_dm &lt;raw_json&gt; &lt;file&gt; &lt;link&gt;<button
+                                class="copy-btn" title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Add a DM welcome config</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/welcome dashboard<button class="copy-btn" title="Copy Command"><svg
+                                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Paginated welcome config dashboard</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/welcome remove<button class="copy-btn" title="Copy Command"><svg
+                                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Remove a welcome config via dropdown</div>
+                    </div>
+                </details>
+            </section>
+
+            <section id="cmd-toplevel" class="doc-section cmd-category">
+                <details class="cmd-accordion">
+                    <summary>
+                        <h3>Top-Level & Developer Commands</h3>
+                    </summary>
+                    <div class="command-card">
+                        <div class="command-title">/case &lt;case_id&gt; &lt;user&gt; &lt;user_id&gt;<button
+                                class="copy-btn" title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> View a specific case or a user's latest case</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/duration &lt;case_id&gt; &lt;new_duration&gt;<button
+                                class="copy-btn" title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Extend or reduce an active mute or temp-ban</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/flip<button class="copy-btn" title="Copy Command"><svg width="16"
+                                    height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Flip a coin</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/gallery_add &lt;channel&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Lock a channel to image/file uploads only.</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/gallery_remove &lt;channel&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Remove gallery restrictions from a channel.</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/gallery_role_add &lt;role&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Whitelist a role to bypass gallery restrictions.</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/gallery_role_remove &lt;role&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Remove a role from the gallery whitelist.</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/lockdown &lt;channel&gt; &lt;message&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Lock a channel — prevent all roles from sending messages
+                        </div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/members &lt;role&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> List members holding a specific role</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/moderations<button class="copy-btn" title="Copy Command"><svg
+                                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> View all currently active punishments</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/modlogs &lt;user&gt; &lt;user_id&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> View all moderation history for a user</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/modstats &lt;moderator&gt; &lt;user_id&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> View moderation statistics for a staff member</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/notes &lt;user&gt; &lt;user_id&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> View all staff notes on a user</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/reason &lt;case_id&gt; &lt;new_reason&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Update the reason on an existing case</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/remind &lt;time&gt; &lt;text&gt; &lt;dm_notify&gt;
+                            &lt;ping_users&gt;
+                            &lt;channel&gt; &lt;custom_embed&gt; &lt;invite_button&gt; &lt;frequency&gt;
+                            &lt;frequency_count&gt;</div>
+                        <div><strong>Description:</strong> [Mod] Schedule an advanced notification</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/roll &lt;sides&gt;<button class="copy-btn" title="Copy Command"><svg
+                                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Roll a die</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/setlogchannel &lt;channel&gt; &lt;server_log&gt;<button
+                                class="copy-btn" title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Set the mod-log and/or server-log channel</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/slowmode &lt;seconds&gt; &lt;channel&gt; &lt;duration&gt;<button
+                                class="copy-btn" title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Set slowmode delay for a channel</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/softban &lt;user&gt; &lt;reason&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Ban and instantly unban a user (clears 7d of messages)</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/sync &lt;sync_type&gt; &lt;wipe_db&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Pull latest code from GitHub and reload the bot</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/unlock &lt;channel&gt; &lt;message&gt;<button class="copy-btn"
+                                title="Copy Command"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Unlock a previously locked channel</div>
+                    </div>
+
+                    <div class="command-card">
+                        <div class="command-title">/vsync<button class="copy-btn" title="Copy Command"><svg width="16"
+                                    height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> No description provided.</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/warn &lt;user&gt; &lt;message_id&gt; &lt;channel&gt; &lt;reason&gt;
+                        </div>
+                        <div><strong>Description:</strong> Warn a user, delete their message, and escalate strikes</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">/whois &lt;user&gt;<button class="copy-btn" title="Copy Command"><svg
+                                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg></button></div>
+                        <div><strong>Description:</strong> Detailed info about a user</div>
+                    </div>
+                </details>
+            </section>
+
+            <section id="tasks" class="doc-section searchable-section">
+                <h2>4. Background Tasks & Event Listeners</h2>
+                <p>HexVoid utilizes silent background loops (via <code>tasks.loop</code>) to execute strict cron jobs
+                    and maintain data integrity without manual intervention.</p>
+                <ul class="content-ul">
+                    <li><strong><code>tickets.py</code> (30 min loop):</strong> Sweeps for abandoned or inactive tickets
+                        based on inactivity limits and automatically clears them out.</li>
+                    <li><strong><code>reminders.py</code> (12 sec loop):</strong> Polls the database for expired
+                        personal reminders to send alerts securely.</li>
+                    <li><strong><code>giveaway.py</code> (15 sec loop):</strong> Actively monitors live giveaways to
+                        trigger automated endings, pick winners, and distribute prizes safely.</li>
+                    <li><strong><code>events.py</code> & <code>scheduler.py</code>:</strong> Contains rolling timers for
+                        rotating the bot status and processing core scheduled jobs natively.</li>
+                    <li><strong><code>events.py</code> Cache Warmup (on_ready task):</strong> A background daemon that
+                        slowly reconstructs the internal discord.py message cache (capped at 100,000) post-reboot by
+                        silently iterating text and thread channels, ensuring robust delete/edit tracking.</li>
+                    <li><strong><code>autoroles.py</code> (60 sec loop):</strong> A reaper cron loop scanning
+                        <code>hexvoid_timed_roles</code> for expired entries to strip roles cleanly using Discord API.
+                    </li>
+                    <li><strong><code>automod.py</code> (60 sec loop):</strong> The primary Automod Decay Engine that
+                        assesses rule breakers and actively decays strike levels over time for reformed members.</li>
+                    <li><strong><code>appeals_portal.py</code> & Support Tickets:</strong> Detects incoming webhook
+                        embeds and attaches interactive Persistent Views (Appeals vs Support). Redis Upstash caching is
+                        natively utilized.</li>
+                    <li><strong><code>audit_log.py</code> (Event Listener):</strong> Hybrid audit logging system built
+                        on pure event-driven pipelines using Attribution dicts and TTL dedup cache logic to avoid
+                        excessive API polling.</li>
+                </ul>
+            </section>
+
+            <section id="database" class="doc-section searchable-section">
+                <h2>5. Database Schema Reference</h2>
+                <p>The <span class="path">database/db.py</span> layer handles HexVoid's heavy lifting. Below are the
+                    critical tables actively powering the bot's state:</p>
+                <ul class="content-ul">
+                    <li><strong><code>cases</code> & <code>user_strikes</code>:</strong> The heart of HexVoid's
+                        moderation. Tracks active/historic moderation cases, moderator IDs, decay timers, and dynamic
+                        strike levels per user.</li>
+                    <li><strong><code>active_punishments</code>:</strong> Tracks time-based mutes/bans natively using
+                        scheduled expiry checkpoints instead of RAM timeouts.</li>
+                    <li><strong><code>giveaways</code> & <code>giveaway_entries</code>:</strong> Houses full giveaway
+                        logic including requirements, whitelists, and live participant weights.</li>
+                    <li><strong><code>ticket_panels</code> & <code>active_tickets</code>:</strong> Dedicated tracking
+                        for full ticket portal configurations, custom settings, log channels, and individual live state
+                        management.</li>
+                    <li><strong><code>reminders</code> & <code>afk_users</code>:</strong> Deep state tracking for custom
+                        alerts, repetitive DM notification loops, AFK statuses, and snoozes.</li>
+                    <li><strong><code>counting_config</code> & <code>automod_config</code>:</strong> JSON-serialized
+                        configuration schemas dictating guild-specific preferences explicitly without cache duplication.
+                    </li>
+                </ul>
+            </section>
+
+            <section id="rules" class="doc-section searchable-section">
+                <h2>6. Developer "Do's and Don'ts" (The HexVoid Standard)</h2>
+                <p>Adhere to the following ruleset:</p>
+                <ul class="dos-and-donts">
+                    <li><span class="do">DO:</span> Use the Dual-Check Permission system (Both
+                        <code>@app_commands.default_permissions(...)</code> AND <code>@validate_context(...)</code>).
+                    </li>
+                    <li><span class="do">DO:</span> Deploy strict Context Decorators
+                        (<code>@app_commands.allowed_installs(guilds=True)</code> and
+                        <code>@app_commands.allowed_contexts(...)</code>).
+                    </li>
+                    <li><span class="do">DO:</span> Defer immediately with
+                        <code>await interaction.response.defer(ephemeral=True)</code> for ANY command hitting the
+                        API/DB.
+                    </li>
+                    <li><span class="do">DO:</span> Wrap all API role/message manipulation in
+                        <code>try/except (discord.Forbidden, discord.HTTPException)</code>.
+                    </li>
+                    <li><span class="do">DO:</span> Wrap the inside of ANY <code>tasks.loop</code> in a broad
+                        <code>try/except Exception</code> so the daemon loop never dies silently.
+                    </li>
+                    <li><span class="dont">DON'T:</span> Cache unbounded lists/dictionaries in RAM. Rely purely on async
+                        SQLite lookups for lookup validation.</li>
+                    <li><span class="dont">DON'T:</span> Pop a <code>discord.ui.Modal</code> AFTER an interaction has
+                        been deferred. Modals must be pushed on the initial response frame.</li>
+                    <li><span class="info">INFO:</span> This list will be updated actively by itshecker. If you made any
+                        changes feel free to update them.</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <!-- Script for Search and Sidebar interactions -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('search-input');
+            const emptyState = document.getElementById('search-empty');
+
+            // All searchable things: commands, general text sections
+            const commandCards = document.querySelectorAll('.command-card');
+            const sections = document.querySelectorAll('.doc-section');
+            const textSections = document.querySelectorAll('.searchable-section');
+
+            // Toast Notification function
+            function showToast(message) {
+                let container = document.getElementById('toast-container');
+                if (!container) {
+                    container = document.createElement('div');
+                    container.id = 'toast-container';
+                    container.className = 'toast-container';
+                    document.body.appendChild(container);
+                }
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                toast.textContent = message;
+                container.appendChild(toast);
+
+                setTimeout(() => {
+                    toast.remove();
+                }, 3000);
+            }
+
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase().trim();
+                let hasResults = false;
+
+                if (query === '') {
+                    // Reset everything to visible
+                    commandCards.forEach(card => card.classList.remove('hidden'));
+                    sections.forEach(sec => sec.classList.remove('hidden'));
+                    textSections.forEach(sec => sec.classList.remove('hidden'));
+                    emptyState.style.display = 'none';
+                    return;
+                }
+
+                // Filter command cards
+                commandCards.forEach(card => {
+                    const text = card.textContent.toLowerCase();
+                    if (text.includes(query)) {
+                        card.classList.remove('hidden');
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                });
+
+                // Filter sections based on visible commands or internal text
+                sections.forEach(category => {
+                    let sectionHasResults = false;
+
+                    // If it's a command category, check if any child command is visible
+                    if (category.classList.contains('cmd-category')) {
+                        const visibleCommands = category.querySelectorAll('.command-card:not(.hidden)');
+                        if (visibleCommands.length > 0) {
+                            sectionHasResults = true;
+                        }
+                    }
+
+                    // If it's a text section, check if the text matches
+                    if (category.classList.contains('searchable-section')) {
+                        const text = category.textContent.toLowerCase();
+                        if (text.includes(query)) {
+                            sectionHasResults = true;
+                        }
+                    }
+
+                    if (sectionHasResults) {
+                        category.classList.remove('hidden');
+                        hasResults = true;
+                    } else {
+                        category.classList.add('hidden');
+                    }
+                });
+
+                if (!hasResults) {
+                    emptyState.style.display = 'block';
+                } else {
+                    emptyState.style.display = 'none';
+                }
+            });
+
+
+            // Copy to Clipboard (Entire Command Text click stripped of variables)
+            document.querySelectorAll('.command-title').forEach(titleElement => {
+                titleElement.style.cursor = 'pointer';
+                titleElement.title = 'Click to copy command';
+
+                titleElement.addEventListener('click', (e) => {
+                    if (titleElement.dataset.copying) return;
+
+                    const fullText = titleElement.textContent.trim();
+                    // Strip off anything starting with '<' (parameters) to just copy the command
+                    const commandOnly = fullText.split('<')[0].trim();
+
+                    navigator.clipboard.writeText(commandOnly).then(() => {
+                        titleElement.dataset.copying = 'true';
+
+                        // Fire the Toast Notification
+                        showToast(`Copied ${commandOnly} to clipboard!`);
+
+                        // Show visual feedback on the SVG icon if present
+                        const copyBtn = titleElement.querySelector('.copy-btn');
+                        let originalHtml = '';
+                        if (copyBtn) {
+                            originalHtml = copyBtn.innerHTML;
+                            copyBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+                        }
+
+                        // Subtle background flash
+                        const oldBg = titleElement.style.background;
+                        titleElement.style.background = 'rgba(74, 222, 128, 0.15)';
+
+                        setTimeout(() => {
+                            if (copyBtn) copyBtn.innerHTML = originalHtml;
+                            titleElement.style.background = oldBg;
+                            delete titleElement.dataset.copying;
+                        }, 2000);
+                    });
+                });
+            });
+
+            // ScrollSpy
+            const observerOptions = {
+                root: null,
+                rootMargin: '-10% 0px -70% 0px',
+                threshold: 0
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && entry.intersectionRatio > 0) {
+                        const id = entry.target.getAttribute('id');
+                        if (!id) return;
+                        document.querySelectorAll('aside a').forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href') === '#' + id) {
+                                link.classList.add('active');
+                                // Ensure sidebar scrolls to active link
+                                link.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                            }
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('section[id], h2[id]').forEach(section => {
+                observer.observe(section);
+            });
+
+            // Smooth scrolling for sidebar links
+            document.querySelectorAll('aside a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

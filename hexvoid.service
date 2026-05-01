@@ -1,0 +1,14 @@
+[Unit]
+Description=HexVoid Discord Bot
+After=network.target
+
+[Service]
+User=hexvoid
+Group=hexvoid
+WorkingDirectory=/opt/hexvoid
+ExecStart=/bin/bash /opt/hexvoid/start_bot.sh
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

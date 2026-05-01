@@ -1,0 +1,121 @@
+==================================================
+HEXVOID BOT - PRODUCTION DEPLOYMENT GUIDE (LINUX)
+==================================================
+
+Follow THESE steps exactly to deploy the HexVoid bot on Ubuntu (Debian-based).
+
+--------------------------------------------------
+STEP 1: INSTALL SYSTEM DEPENDENCIES
+--------------------------------------------------
+Run these commands to update the system and install required tools:
+
+    sudo apt update && sudo apt upgrade -y
+    sudo apt install git python3 python3-pip python3-venv build-essential -y
+
+--------------------------------------------------
+STEP 2: CREATE SERVICE USER
+--------------------------------------------------
+The bot should run under its own restricted user account:
+
+    sudo useradd -m -s /bin/bash hexvoid
+
+--------------------------------------------------
+STEP 3: GENERATE SSH DEPLOY KEY
+--------------------------------------------------
+The bot requires a Deploy Key to pull updates from GitHub via the /sync command.
+Run this command AS YOURSELF (or as root):
+
+    ssh-keygen -t ed25519 -C "terra-blackarch-hexvoid"
+
+!!! CRITICAL WARNING !!!
+- When it asks for a file location, press ENTER.
+- When it asks for a PASSPHRASE, you MUST leave it EMPTY and press ENTER twice.
+- If you add a password, the bot's auto-sync (/sync) will FREEZE and fail.
+
+--------------------------------------------------
+STEP 4: AUTHORIZE KEY ON GITHUB
+--------------------------------------------------
+1. Output your new public key:
+   cat ~/.ssh/id_ed25519.pub
+
+2. Copy the entire string (starting with ssh-ed25519...) and send it to the developer.
+3. WAIT for the developer to confirm the key has been added to the GitHub repository "Deploy Keys" section.
+
+--------------------------------------------------
+STEP 5: CLONE THE REPO (VIA SSH)
+--------------------------------------------------
+Once authorized, clone the repository strictly via SSH to /opt/hexvoid:
+
+    sudo mkdir -p /opt/hexvoid
+    sudo chown $USER:$USER /opt/hexvoid
+    git clone git@github.com:the-voidproject/HexVoid.git /opt/hexvoid
+    sudo chown -R hexvoid:hexvoid /opt/hexvoid
+    cd /opt/hexvoid
+
+--------------------------------------------------
+STEP 6: VIRTUAL ENVIRONMENT & REQUIREMENTS
+--------------------------------------------------
+Setup the Python environment inside the project folder:
+
+    sudo -u hexvoid python3 -m venv /opt/hexvoid/venv
+    sudo -u hexvoid /opt/hexvoid/venv/bin/pip install -r /opt/hexvoid/requirements.txt
+
+--------------------------------------------------
+STEP 7: CONFIGURATION (.env)
+--------------------------------------------------
+1. Create the .env file from the template:
+   sudo -u hexvoid cp /opt/hexvoid/.env.example /opt/hexvoid/.env
+
+2. Edit the .env file (sudo -u hexvoid nano /opt/hexvoid/.env) and ensure:
+   - GITHUB_REPO_URL="" (Leave empty for SSH tracking)
+   - BOT_TOKEN="your_token_here"
+   - SYNC_ALLOWED_USER_IDS="your_discord_id"
+
+--------------------------------------------------
+STEP 8: SYSTEMD DAEMON SETUP
+--------------------------------------------------
+Create the service file to ensure the bot starts on boot:
+
+    sudo nano /etc/systemd/system/hexvoid.service
+
+Paste the following block exactly:
+
+[Unit]
+Description=HexVoid Discord Bot
+After=network.target
+
+[Service]
+User=hexvoid
+Group=hexvoid
+WorkingDirectory=/opt/hexvoid
+ExecStart=/bin/bash /opt/hexvoid/start_bot.sh
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+
+Save and exit. Then enable and start the service:
+
+    sudo systemctl daemon-reload
+    sudo systemctl enable hexvoid
+    sudo systemctl start hexvoid
+
+--------------------------------------------------
+STEP 9: VISUDO SECURITY (FOR /SYNC HARD)
+--------------------------------------------------
+This allows the bot to execute a "Hard Sync" (full reboot) via Discord.
+
+Run:
+    sudo visudo
+
+Scroll to the bottom and add this EXACT line:
+
+    hexvoid ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart hexvoid
+
+Save and exit.
+
+==================================================
+DEPLOYMENT COMPLETE
+==================================================
+Check logs with: sudo journalctl -u hexvoid -f
